@@ -748,10 +748,35 @@
                 transition-duration: 0.01ms !important;
             }
         }
+    
+        /* MATRIX RAIN BACKGROUND — decorative only, keeps all existing content intact */
+        #matrix-rain {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.22;
+        }
+        /* Keep Matrix behind the site without changing normal page layout. */
+        .boot-screen {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100dvh;
+            z-index: 10000 !important;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #matrix-rain { opacity: 0.12; }
+        }
+
     </style>
 </head>
 
 <body class="loading-locked">
+<canvas id="matrix-rain" aria-hidden="true"></canvas>
 
 <!-- SYSTEM BOOT SCREEN -->
 <div class="boot-screen" id="bootScreen" role="status" aria-live="polite">
@@ -1225,6 +1250,93 @@ Type "help" to view available commands.</div>
         terminalInput.value = "";
         terminalBody.scrollTop = terminalBody.scrollHeight;
     });
+
+    /* MATRIX RAIN: green symbols with occasional red accents */
+    (() => {
+        const canvas = document.getElementById('matrix-rain');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d', { alpha: true });
+        if (!ctx) return;
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const chars = 'アカサタナハマヤラワ012345789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}';
+        let width = 0;
+        let height = 0;
+        let columns = [];
+        let fontSize = 14;
+        let frame = 0;
+        let animationId = null;
+
+        function resizeMatrix() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = Math.floor(width * dpr);
+            canvas.height = Math.floor(height * dpr);
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            fontSize = width < 600 ? 12 : 14;
+            columns = Array.from(
+                { length: Math.ceil(width / fontSize) },
+                () => Math.random() * (height / fontSize)
+            );
+            ctx.clearRect(0, 0, width, height);
+        }
+
+        function drawMatrix() {
+            if (document.hidden) {
+                animationId = null;
+                return;
+            }
+
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.075)';
+            ctx.fillRect(0, 0, width, height);
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < columns.length; i++) {
+                const char = chars[Math.floor(Math.random() * chars.length)];
+                const x = i * fontSize;
+                const y = columns[i] * fontSize;
+                const redAccent = Math.random() < 0.025;
+
+                ctx.fillStyle = redAccent ? 'rgba(255, 48, 48, 0.9)' : 'rgba(57, 255, 20, 0.8)';
+                ctx.fillText(char, x, y);
+
+                if (y > height && Math.random() > 0.975) {
+                    columns[i] = 0;
+                } else {
+                    columns[i] += reducedMotion ? 0.15 : (Math.random() * 0.45 + 0.25);
+                }
+            }
+
+            frame++;
+            animationId = window.requestAnimationFrame(drawMatrix);
+        }
+
+        function startMatrix() {
+            if (animationId === null) {
+                animationId = window.requestAnimationFrame(drawMatrix);
+            }
+        }
+
+        function stopMatrix() {
+            if (animationId !== null) {
+                window.cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+        }
+
+        resizeMatrix();
+        startMatrix();
+        window.addEventListener('resize', resizeMatrix, { passive: true });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopMatrix();
+            else startMatrix();
+        });
+    })();
+
 </script>
 
 </body>
