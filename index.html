@@ -12,9 +12,11 @@
             --bg: #050505;
             --card: #0b0b0b;
             --green: #39ff14;
+            --red: #ff334f;
             --white: #f5f5f5;
             --gray: #999;
             --border: rgba(57, 255, 20, 0.22);
+            --red-border: rgba(255, 51, 79, 0.35);
         }
 
         * {
@@ -32,14 +34,181 @@
             overflow-x: hidden;
         }
 
+        body.loading-locked {
+            overflow: hidden;
+        }
+
         a {
             color: inherit;
             text-decoration: none;
         }
 
+        button, input {
+            font: inherit;
+        }
+
         .container {
             width: min(1100px, 90%);
             margin: auto;
+        }
+
+        /* SYSTEM BOOT SCREEN */
+
+        .boot-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at 50% 45%, rgba(57, 255, 20, 0.08), transparent 38%),
+                #050505;
+            transition: opacity 0.55s ease, visibility 0.55s ease;
+        }
+
+        .boot-screen.is-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .boot-panel {
+            width: min(520px, 100%);
+            border: 1px solid rgba(57, 255, 20, 0.45);
+            background: rgba(7, 7, 7, 0.96);
+            box-shadow: 0 0 35px rgba(57, 255, 20, 0.08);
+            font-family: monospace;
+            overflow: hidden;
+        }
+
+        .boot-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-bottom: 1px solid #242424;
+            background: #101010;
+            color: #aaa;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .boot-lights {
+            display: flex;
+            gap: 6px;
+        }
+
+        .boot-lights span {
+            width: 8px;
+            height: 8px;
+            display: block;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .boot-lights span:first-child { background: var(--red); }
+        .boot-lights span:nth-child(2) { background: #d9b34b; }
+        .boot-lights span:nth-child(3) { background: var(--green); }
+
+        .boot-content {
+            padding: 25px 22px 22px;
+        }
+
+        .boot-logo {
+            color: var(--white);
+            font-weight: 900;
+            font-size: clamp(27px, 7vw, 38px);
+            letter-spacing: -1px;
+            margin-bottom: 3px;
+        }
+
+        .boot-logo span {
+            color: var(--green);
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.55);
+        }
+
+        .boot-subtitle {
+            color: #777;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 26px;
+        }
+
+        .boot-lines {
+            display: grid;
+            gap: 9px;
+            min-height: 116px;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .boot-line {
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.22s ease, transform 0.22s ease;
+        }
+
+        .boot-line.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .boot-line .ok { color: var(--green); }
+        .boot-line .warn { color: var(--red); }
+
+        .boot-progress-track {
+            height: 4px;
+            background: #1b1b1b;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .boot-progress {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--green), var(--red));
+            box-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
+            transition: width 0.3s ease;
+        }
+
+        .boot-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 12px;
+            color: #666;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .boot-footer strong {
+            color: var(--green);
+            font-weight: normal;
+        }
+
+        .boot-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 18px;
+        }
+
+        .skip-boot {
+            color: #aaa;
+            background: transparent;
+            border: 1px solid #333;
+            padding: 8px 12px;
+            font-family: monospace;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .skip-boot:hover,
+        .skip-boot:focus-visible {
+            color: var(--green);
+            border-color: var(--green);
         }
 
         /* NAVIGATION */
@@ -87,7 +256,8 @@
             transition: 0.3s;
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover,
+        .nav-links a:focus-visible {
             color: var(--green);
         }
 
@@ -114,6 +284,24 @@
             pointer-events: none;
         }
 
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            background: var(--red);
+            opacity: 0.045;
+            filter: blur(100px);
+            right: 22%;
+            bottom: 8%;
+            pointer-events: none;
+        }
+
+        .hero > div {
+            position: relative;
+            z-index: 1;
+        }
+
         .status {
             display: inline-block;
             color: var(--green);
@@ -123,6 +311,22 @@
             font-size: 12px;
             letter-spacing: 1px;
             margin-bottom: 25px;
+        }
+
+        .status::before {
+            content: "";
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            margin-right: 9px;
+            box-shadow: 0 0 8px var(--green);
+            animation: statusPulse 1.8s infinite;
+        }
+
+        @keyframes statusPulse {
+            50% { opacity: 0.35; }
         }
 
         .hero h1 {
@@ -136,6 +340,11 @@
         .highlight {
             color: var(--green);
             text-shadow: 0 0 18px rgba(57, 255, 20, 0.28);
+        }
+
+        .red-accent {
+            color: var(--red);
+            text-shadow: 0 0 15px rgba(255, 51, 79, 0.22);
         }
 
         .hero p {
@@ -159,6 +368,7 @@
             font-size: 13px;
             font-weight: bold;
             transition: 0.3s;
+            cursor: pointer;
         }
 
         .btn-primary {
@@ -190,6 +400,11 @@
             letter-spacing: 1px;
         }
 
+        .hero-bottom span::before {
+            content: "// ";
+            color: var(--red);
+        }
+
         /* GENERAL SECTIONS */
 
         section:not(.hero) {
@@ -203,6 +418,12 @@
             font-size: 12px;
             letter-spacing: 2px;
             margin-bottom: 12px;
+        }
+
+        .section-label::before {
+            content: "● ";
+            color: var(--red);
+            font-size: 9px;
         }
 
         .section-title {
@@ -235,6 +456,19 @@
             border: 1px solid var(--border);
             background: var(--card);
             padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 4px;
+            height: 55px;
+            background: var(--red);
+            opacity: 0.9;
         }
 
         .profile-card .symbol {
@@ -304,9 +538,14 @@
             border: 1px solid #303030;
             background: #080808;
             overflow: hidden;
+            box-shadow: 0 0 28px rgba(57, 255, 20, 0.035);
         }
 
         .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
             background: #111;
             padding: 12px 16px;
             border-bottom: 1px solid #252525;
@@ -315,11 +554,29 @@
             font-family: monospace;
         }
 
+        .terminal-lights {
+            display: flex;
+            gap: 6px;
+        }
+
+        .terminal-lights span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #444;
+        }
+
+        .terminal-lights span:first-child { background: var(--red); }
+        .terminal-lights span:nth-child(2) { background: #d9b34b; }
+        .terminal-lights span:nth-child(3) { background: var(--green); }
+
         .terminal-body {
             padding: 22px;
             font-family: monospace;
             font-size: 13px;
             min-height: 180px;
+            max-height: 380px;
+            overflow-y: auto;
         }
 
         .terminal-output {
@@ -329,13 +586,19 @@
             margin-bottom: 15px;
         }
 
+        .terminal-output .terminal-error {
+            color: var(--red);
+        }
+
         .terminal-form {
             display: flex;
+            align-items: baseline;
             gap: 10px;
         }
 
         .terminal-form label {
             color: var(--green);
+            white-space: nowrap;
         }
 
         .terminal-form input {
@@ -346,6 +609,18 @@
             border: none;
             outline: none;
             font: inherit;
+            caret-color: var(--green);
+        }
+
+        .terminal-form input::placeholder {
+            color: #555;
+        }
+
+        .terminal-hint {
+            color: #666;
+            font-family: monospace;
+            font-size: 11px;
+            margin-top: 12px;
         }
 
         /* CONTACT */
@@ -356,8 +631,20 @@
             background: linear-gradient(
                 135deg,
                 rgba(57, 255, 20, 0.05),
+                rgba(255, 51, 79, 0.025),
                 transparent
             );
+            position: relative;
+        }
+
+        .contact-box::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 70px;
+            background: var(--red);
         }
 
         .contact-box p {
@@ -434,11 +721,75 @@
             .contact-box {
                 padding: 25px;
             }
+
+            .terminal-body {
+                padding: 17px;
+                font-size: 12px;
+            }
+
+            .terminal-form {
+                gap: 7px;
+            }
+
+            .terminal-form label {
+                font-size: 11px;
+            }
+
+            .boot-content {
+                padding: 22px 17px 18px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                scroll-behavior: auto !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="loading-locked">
+
+<!-- SYSTEM BOOT SCREEN -->
+<div class="boot-screen" id="bootScreen" role="status" aria-live="polite">
+    <div class="boot-panel">
+        <div class="boot-topbar">
+            <div class="boot-lights" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+            <span>IMRX_BOOT // SESSION INIT</span>
+        </div>
+
+        <div class="boot-content">
+            <div class="boot-logo">IMRX<span>.DEV</span></div>
+            <div class="boot-subtitle">SYSTEM INITIALIZING</div>
+
+            <div class="boot-lines" id="bootLines">
+                <div class="boot-line" data-delay="250"><span class="ok">[ OK ]</span> CORE SYSTEM</div>
+                <div class="boot-line" data-delay="650"><span class="ok">[ OK ]</span> LOADING MODULES</div>
+                <div class="boot-line" data-delay="1050"><span class="ok">[ OK ]</span> CHECKING INTERFACE</div>
+                <div class="boot-line" data-delay="1450"><span class="ok">[ OK ]</span> TERMINAL READY</div>
+                <div class="boot-line" data-delay="1850"><span class="ok">[ OK ]</span> SYSTEM ONLINE</div>
+            </div>
+
+            <div class="boot-progress-track" aria-hidden="true">
+                <div class="boot-progress" id="bootProgress"></div>
+            </div>
+
+            <div class="boot-footer">
+                <span>STATUS: <strong id="bootStatus">STARTING</strong></span>
+                <span id="bootPercent">0%</span>
+            </div>
+
+            <div class="boot-actions">
+                <button class="skip-boot" id="skipBoot" type="button">SKIP INTRO ↗</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <header>
     <nav class="container">
@@ -454,9 +805,7 @@
 </header>
 
 <main>
-
     <!-- HERO -->
-
     <section class="hero container" id="home">
         <div>
             <div class="status">SYSTEM ONLINE // IMRX.DEV</div>
@@ -486,7 +835,6 @@
     </section>
 
     <!-- ABOUT -->
-
     <section id="about">
         <div class="container">
             <div class="section-label">// 01 — ABOUT ME</div>
@@ -519,7 +867,6 @@
     </section>
 
     <!-- SKILLS -->
-
     <section id="skills">
         <div class="container">
             <div class="section-label">// 02 — SKILLS</div>
@@ -564,7 +911,6 @@
     </section>
 
     <!-- PROJECTS -->
-
     <section id="projects">
         <div class="container">
             <div class="section-label">// 03 — PROJECTS</div>
@@ -609,7 +955,6 @@
     </section>
 
     <!-- TERMINAL -->
-
     <section id="terminal">
         <div class="container">
             <div class="section-label">// 04 — INTERACTIVE TERMINAL</div>
@@ -622,10 +967,13 @@
 
             <div class="terminal">
                 <div class="terminal-header">
-                    IMRX_TERMINAL — BROWSER SESSION
+                    <span>IMRX_TERMINAL — BROWSER SESSION</span>
+                    <div class="terminal-lights" aria-hidden="true">
+                        <span></span><span></span><span></span>
+                    </div>
                 </div>
 
-                <div class="terminal-body">
+                <div class="terminal-body" id="terminalBody">
                     <div class="terminal-output" id="terminalOutput">IMRX.DEV TERMINAL
 MISSION: THINK. BUILD. DOMINATE.
 
@@ -638,16 +986,18 @@ Type "help" to view available commands.</div>
                             type="text"
                             placeholder="Enter command..."
                             autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
                             aria-label="Terminal command"
                         >
                     </form>
                 </div>
             </div>
+            <p class="terminal-hint">SIMULATED TERMINAL // TYPE <span class="highlight">help</span> TO BEGIN</p>
         </div>
     </section>
 
     <!-- CONTACT -->
-
     <section id="contact">
         <div class="container">
             <div class="section-label">// 05 — CONTACT</div>
@@ -663,6 +1013,7 @@ Type "help" to view available commands.</div>
                     on a project? Feel free to reach out.
                 </p>
 
+                <!-- Temporary placeholder: replace with your real email later. -->
                 <a
                     class="btn btn-primary"
                     href="mailto:hello@imrx.dev?subject=Hello%20IMRX.DEV"
@@ -672,7 +1023,6 @@ Type "help" to view available commands.</div>
             </div>
         </div>
     </section>
-
 </main>
 
 <footer>
@@ -684,74 +1034,196 @@ Type "help" to view available commands.</div>
 </footer>
 
 <script>
-    document.getElementById("year").textContent =
-        new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
 
+    /* BOOT INTRO: once per browser tab session */
+    const bootScreen = document.getElementById("bootScreen");
+    const bootLines = Array.from(document.querySelectorAll(".boot-line"));
+    const bootProgress = document.getElementById("bootProgress");
+    const bootPercent = document.getElementById("bootPercent");
+    const bootStatus = document.getElementById("bootStatus");
+    const skipBoot = document.getElementById("skipBoot");
+
+    let bootTimers = [];
+    let audioContext = null;
+    let soundEnabled = false;
+
+    function playTone(frequency, duration, type = "sine", volume = 0.025, delay = 0) {
+        if (!soundEnabled) return;
+
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) return;
+
+            if (!audioContext) audioContext = new AudioContextClass();
+            if (audioContext.state === "suspended") audioContext.resume();
+
+            const oscillator = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + delay);
+            gain.gain.setValueAtTime(0.0001, audioContext.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + delay + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + duration);
+
+            oscillator.connect(gain);
+            gain.connect(audioContext.destination);
+            oscillator.start(audioContext.currentTime + delay);
+            oscillator.stop(audioContext.currentTime + delay + duration + 0.03);
+        } catch (error) {
+            /* Audio is optional; the website still works if sound is unavailable. */
+        }
+    }
+
+    function playBootSound(finalSound = false) {
+        if (finalSound) {
+            playTone(660, 0.12, "sine", 0.035);
+            playTone(880, 0.18, "sine", 0.035, 0.13);
+        } else {
+            playTone(520, 0.07, "square", 0.012);
+        }
+    }
+
+    function finishBoot() {
+        bootTimers.forEach(clearTimeout);
+        bootTimers = [];
+        bootLines.forEach(line => line.classList.add("visible"));
+        bootProgress.style.width = "100%";
+        bootPercent.textContent = "100%";
+        bootStatus.textContent = "ONLINE";
+        bootStatus.style.color = "var(--green)";
+        bootScreen.classList.add("is-hidden");
+        document.body.classList.remove("loading-locked");
+
+        try {
+            sessionStorage.setItem("imrxBootSeen", "yes");
+        } catch (error) {
+            /* Session storage may be unavailable in some browser modes. */
+        }
+    }
+
+    function startBoot() {
+        let alreadySeen = false;
+
+        try {
+            alreadySeen = sessionStorage.getItem("imrxBootSeen") === "yes";
+        } catch (error) {
+            alreadySeen = false;
+        }
+
+        if (alreadySeen) {
+            bootScreen.classList.add("is-hidden");
+            document.body.classList.remove("loading-locked");
+            return;
+        }
+
+        bootLines.forEach(line => {
+            const delay = Number(line.dataset.delay) || 0;
+            const timer = setTimeout(() => {
+                line.classList.add("visible");
+                const count = bootLines.filter(item => item.classList.contains("visible")).length;
+                const percent = Math.round((count / bootLines.length) * 100);
+                bootProgress.style.width = percent + "%";
+                bootPercent.textContent = percent + "%";
+
+                if (count < bootLines.length) {
+                    playBootSound(false);
+                } else {
+                    bootStatus.textContent = "ONLINE";
+                    bootStatus.style.color = "var(--green)";
+                    playBootSound(true);
+                    const hideTimer = setTimeout(finishBoot, 450);
+                    bootTimers.push(hideTimer);
+                }
+            }, delay);
+            bootTimers.push(timer);
+        });
+    }
+
+    /* Sound is enabled only after the visitor interacts with the page. */
+    function enableSoundOnce() {
+        soundEnabled = true;
+        document.removeEventListener("pointerdown", enableSoundOnce);
+        document.removeEventListener("keydown", enableSoundOnce);
+    }
+
+    document.addEventListener("pointerdown", enableSoundOnce, { once: true });
+    document.addEventListener("keydown", enableSoundOnce, { once: true });
+
+    skipBoot.addEventListener("click", finishBoot);
+    startBoot();
+
+    /* INTERACTIVE TERMINAL */
     const terminalForm = document.getElementById("terminalForm");
     const terminalInput = document.getElementById("terminalInput");
     const terminalOutput = document.getElementById("terminalOutput");
+    const terminalBody = document.getElementById("terminalBody");
 
     const welcomeMessage =
         'IMRX.DEV TERMINAL\n' +
         'MISSION: THINK. BUILD. DOMINATE.\n\n' +
         'Type "help" to view available commands.';
 
+    const responses = {
+        help:
+            "AVAILABLE COMMANDS\n" +
+            "help     — Show available commands\n" +
+            "about    — About IMRX.DEV\n" +
+            "skills   — View development skills\n" +
+            "projects — View current projects\n" +
+            "whoami   — Identify this session\n" +
+            "clear    — Clear the terminal",
+
+        about:
+            "IMRX.DEV\n" +
+            "A personal developer portfolio.\n" +
+            "Think. Build. Dominate.",
+
+        skills:
+            "SKILLS OVERVIEW\n" +
+            "01. Web Development\n" +
+            "02. UI & Design\n" +
+            "03. Problem Solving\n" +
+            "STATUS: ALWAYS LEARNING",
+
+        projects:
+            "PROJECT DIRECTORY\n" +
+            "01. IMRX.DEV Portfolio\n" +
+            "02. Interactive Terminal\n" +
+            "03. Next Project — Coming Soon",
+
+        whoami:
+            "USER: IMRX\n" +
+            "PLATFORM: IMRX.DEV\n" +
+            "MISSION: THINK. BUILD. DOMINATE."
+    };
+
     terminalForm.addEventListener("submit", function(event) {
         event.preventDefault();
 
-        const command = terminalInput.value.trim().toLowerCase();
+        const rawCommand = terminalInput.value.trim();
+        const command = rawCommand.toLowerCase();
 
         if (!command) return;
 
-        const responses = {
-            help:
-                "AVAILABLE COMMANDS\n" +
-                "help     — Show available commands\n" +
-                "about    — About IMRX.DEV\n" +
-                "skills   — View development skills\n" +
-                "projects — View current projects\n" +
-                "whoami   — Identify this session\n" +
-                "clear    — Clear the terminal",
-
-            about:
-                "IMRX.DEV\n" +
-                "A personal developer portfolio.\n" +
-                "Think. Build. Dominate.",
-
-            skills:
-                "SKILLS OVERVIEW\n" +
-                "01. Web Development\n" +
-                "02. UI & Design\n" +
-                "03. Problem Solving\n" +
-                "STATUS: ALWAYS LEARNING",
-
-            projects:
-                "PROJECT DIRECTORY\n" +
-                "01. IMRX.DEV Portfolio\n" +
-                "02. Interactive Terminal\n" +
-                "03. Next Project — Coming Soon",
-
-            whoami:
-                "USER: IMRX\n" +
-                "PLATFORM: IMRX.DEV\n" +
-                "MISSION: THINK. BUILD. DOMINATE."
-        };
-
         if (command === "clear") {
-            terminalOutput.textContent = "";
+            terminalOutput.textContent = welcomeMessage;
         } else {
-            const response = responses[command] ||
-                'Command not found: "' + command + '".\n' +
-                'Type "help" to see available commands.';
+            const response = responses[command];
 
-            terminalOutput.textContent +=
-                "\n\nimrx@dev:~$ " + command + "\n" + response;
+            const commandLine = document.createElement("div");
+            commandLine.textContent = "\nimrx@dev:~$ " + rawCommand;
+            terminalOutput.appendChild(commandLine);
+
+            const responseLine = document.createElement("div");
+            responseLine.textContent = response || 'Command not found: "' + rawCommand + '".\nType "help" to see available commands.';
+            if (!response) responseLine.className = "terminal-error";
+            terminalOutput.appendChild(responseLine);
         }
 
         terminalInput.value = "";
-
-        terminalOutput.parentElement.scrollTop =
-            terminalOutput.parentElement.scrollHeight;
+        terminalBody.scrollTop = terminalBody.scrollHeight;
     });
 </script>
 
