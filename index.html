@@ -1,1343 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#050505">
-    <meta name="description" content="IMRX.DEV — Personal developer portfolio. Think. Build. Dominate.">
-    <title>IMRX.DEV | Developer Portfolio</title>
-
-    <style>
-        :root {
-            --bg: #050505;
-            --card: #0b0b0b;
-            --green: #39ff14;
-            --red: #ff334f;
-            --white: #f5f5f5;
-            --gray: #999;
-            --border: rgba(57, 255, 20, 0.22);
-            --red-border: rgba(255, 51, 79, 0.35);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--white);
-            font-family: Arial, Helvetica, sans-serif;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        body.loading-locked {
-            overflow: hidden;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        button, input {
-            font: inherit;
-        }
-
-        .container {
-            width: min(1100px, 90%);
-            margin: auto;
-        }
-
-        /* SYSTEM BOOT SCREEN */
-
-        .boot-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            display: grid;
-            place-items: center;
-            padding: 24px;
-            background:
-                radial-gradient(circle at 50% 45%, rgba(57, 255, 20, 0.08), transparent 38%),
-                #050505;
-            transition: opacity 0.55s ease, visibility 0.55s ease;
-        }
-
-        .boot-screen.is-hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .boot-panel {
-            width: min(520px, 100%);
-            border: 1px solid rgba(57, 255, 20, 0.45);
-            background: rgba(7, 7, 7, 0.96);
-            box-shadow: 0 0 35px rgba(57, 255, 20, 0.08);
-            font-family: monospace;
-            overflow: hidden;
-        }
-
-        .boot-topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            border-bottom: 1px solid #242424;
-            background: #101010;
-            color: #aaa;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-
-        .boot-lights {
-            display: flex;
-            gap: 6px;
-        }
-
-        .boot-lights span {
-            width: 8px;
-            height: 8px;
-            display: block;
-            border-radius: 50%;
-            background: #333;
-        }
-
-        .boot-lights span:first-child { background: var(--red); }
-        .boot-lights span:nth-child(2) { background: #d9b34b; }
-        .boot-lights span:nth-child(3) { background: var(--green); }
-
-        .boot-content {
-            padding: 25px 22px 22px;
-        }
-
-        .boot-logo {
-            color: var(--white);
-            font-weight: 900;
-            font-size: clamp(27px, 7vw, 38px);
-            letter-spacing: -1px;
-            margin-bottom: 3px;
-        }
-
-        .boot-logo span {
-            color: var(--green);
-            text-shadow: 0 0 15px rgba(57, 255, 20, 0.55);
-        }
-
-        .boot-subtitle {
-            color: #777;
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-bottom: 26px;
-        }
-
-        .boot-lines {
-            display: grid;
-            gap: 9px;
-            min-height: 116px;
-            color: #aaa;
-            font-size: 12px;
-        }
-
-        .boot-line {
-            opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.22s ease, transform 0.22s ease;
-        }
-
-        .boot-line.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .boot-line .ok { color: var(--green); }
-        .boot-line .warn { color: var(--red); }
-
-        .boot-progress-track {
-            height: 4px;
-            background: #1b1b1b;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .boot-progress {
-            height: 100%;
-            width: 0;
-            background: linear-gradient(90deg, var(--green), var(--red));
-            box-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
-            transition: width 0.3s ease;
-        }
-
-        .boot-footer {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 12px;
-            color: #666;
-            font-size: 10px;
-            letter-spacing: 1px;
-        }
-
-        .boot-footer strong {
-            color: var(--green);
-            font-weight: normal;
-        }
-
-        .boot-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 18px;
-        }
-
-        .skip-boot {
-            color: #aaa;
-            background: transparent;
-            border: 1px solid #333;
-            padding: 8px 12px;
-            font-family: monospace;
-            font-size: 11px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .skip-boot:hover,
-        .skip-boot:focus-visible {
-            color: var(--green);
-            border-color: var(--green);
-        }
-
-        /* NAVIGATION */
-
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(5, 5, 5, 0.94);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid #171717;
-        }
-
-        nav {
-            min-height: 75px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .logo {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            color: white;
-            white-space: nowrap;
-        }
-
-        .logo span {
-            color: var(--green);
-            text-shadow: 0 0 8px var(--green),
-                         0 0 20px rgba(57, 255, 20, 0.6);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 25px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #aaa;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover,
-        .nav-links a:focus-visible {
-            color: var(--green);
-        }
-
-        /* HERO */
-
-        .hero {
-            min-height: 85vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            padding: 90px 0;
-        }
-
-        .hero::before {
-            content: "";
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            background: var(--green);
-            opacity: 0.07;
-            filter: blur(130px);
-            right: 5%;
-            top: 20%;
-            pointer-events: none;
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            background: var(--red);
-            opacity: 0.045;
-            filter: blur(100px);
-            right: 22%;
-            bottom: 8%;
-            pointer-events: none;
-        }
-
-        .hero > div {
-            position: relative;
-            z-index: 1;
-        }
-
-        .status {
-            display: inline-block;
-            color: var(--green);
-            border: 1px solid var(--border);
-            padding: 7px 12px;
-            font-family: monospace;
-            font-size: 12px;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-        }
-
-        .status::before {
-            content: "";
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            background: var(--green);
-            border-radius: 50%;
-            margin-right: 9px;
-            box-shadow: 0 0 8px var(--green);
-            animation: statusPulse 1.8s infinite;
-        }
-
-        @keyframes statusPulse {
-            50% { opacity: 0.35; }
-        }
-
-        .hero h1 {
-            font-size: clamp(42px, 8vw, 82px);
-            line-height: 1.08;
-            letter-spacing: -3px;
-            font-weight: 900;
-            max-width: 850px;
-        }
-
-        .highlight {
-            color: var(--green);
-            text-shadow: 0 0 18px rgba(57, 255, 20, 0.28);
-        }
-
-        .red-accent {
-            color: var(--red);
-            text-shadow: 0 0 15px rgba(255, 51, 79, 0.22);
-        }
-
-        .hero p {
-            max-width: 540px;
-            margin-top: 25px;
-            color: var(--gray);
-            font-size: 16px;
-        }
-
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin-top: 32px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 13px 22px;
-            border: 1px solid var(--green);
-            font-size: 13px;
-            font-weight: bold;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--green);
-            color: #050505;
-        }
-
-        .btn-primary:hover {
-            box-shadow: 0 0 22px rgba(57, 255, 20, 0.4);
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            color: var(--green);
-        }
-
-        .btn-outline:hover {
-            background: rgba(57, 255, 20, 0.08);
-        }
-
-        .hero-bottom {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 35px;
-            margin-top: 65px;
-            color: #666;
-            font-size: 11px;
-            font-family: monospace;
-            letter-spacing: 1px;
-        }
-
-        .hero-bottom span::before {
-            content: "// ";
-            color: var(--red);
-        }
-
-        /* GENERAL SECTIONS */
-
-        section:not(.hero) {
-            padding: 90px 0;
-            border-top: 1px solid #171717;
-        }
-
-        .section-label {
-            color: var(--green);
-            font-family: monospace;
-            font-size: 12px;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-        }
-
-        .section-label::before {
-            content: "● ";
-            color: var(--red);
-            font-size: 9px;
-        }
-
-        .section-title {
-            font-size: clamp(30px, 5vw, 45px);
-            line-height: 1.2;
-            margin-bottom: 20px;
-        }
-
-        .section-description {
-            color: var(--gray);
-            max-width: 650px;
-            margin-bottom: 35px;
-        }
-
-        /* ABOUT */
-
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 35px;
-            align-items: center;
-        }
-
-        .about-copy {
-            color: var(--gray);
-            margin-bottom: 16px;
-        }
-
-        .profile-card {
-            border: 1px solid var(--border);
-            background: var(--card);
-            padding: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .profile-card::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 4px;
-            height: 55px;
-            background: var(--red);
-            opacity: 0.9;
-        }
-
-        .profile-card .symbol {
-            font-size: 45px;
-            color: var(--green);
-            text-shadow: 0 0 18px rgba(57, 255, 20, 0.4);
-            margin-bottom: 15px;
-        }
-
-        .profile-card h3 {
-            margin-bottom: 8px;
-        }
-
-        .profile-card p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        /* SKILLS AND PROJECTS */
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .card {
-            padding: 25px;
-            background: var(--card);
-            border: 1px solid #202020;
-            transition: 0.3s;
-        }
-
-        .card:hover {
-            border-color: var(--green);
-            transform: translateY(-4px);
-        }
-
-        .card-icon {
-            font-size: 28px;
-            margin-bottom: 18px;
-        }
-
-        .card h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        .card p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        .tag {
-            display: inline-block;
-            margin-top: 18px;
-            padding: 5px 8px;
-            color: var(--green);
-            border: 1px solid var(--border);
-            font-family: monospace;
-            font-size: 10px;
-        }
-
-        /* TERMINAL */
-
-        .terminal {
-            border: 1px solid #303030;
-            background: #080808;
-            overflow: hidden;
-            box-shadow: 0 0 28px rgba(57, 255, 20, 0.035);
-        }
-
-        .terminal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            background: #111;
-            padding: 12px 16px;
-            border-bottom: 1px solid #252525;
-            color: #aaa;
-            font-size: 12px;
-            font-family: monospace;
-        }
-
-        .terminal-lights {
-            display: flex;
-            gap: 6px;
-        }
-
-        .terminal-lights span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #444;
-        }
-
-        .terminal-lights span:first-child { background: var(--red); }
-        .terminal-lights span:nth-child(2) { background: #d9b34b; }
-        .terminal-lights span:nth-child(3) { background: var(--green); }
-
-        .terminal-body {
-            padding: 22px;
-            font-family: monospace;
-            font-size: 13px;
-            min-height: 180px;
-            max-height: 380px;
-            overflow-y: auto;
-        }
-
-        .terminal-output {
-            color: var(--green);
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            margin-bottom: 15px;
-        }
-
-        .terminal-output .terminal-error {
-            color: var(--red);
-        }
-
-        .terminal-form {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-        }
-
-        .terminal-form label {
-            color: var(--green);
-            white-space: nowrap;
-        }
-
-        .terminal-form input {
-            min-width: 0;
-            flex: 1;
-            color: white;
-            background: transparent;
-            border: none;
-            outline: none;
-            font: inherit;
-            caret-color: var(--green);
-        }
-
-        .terminal-form input::placeholder {
-            color: #555;
-        }
-
-        .terminal-hint {
-            color: #666;
-            font-family: monospace;
-            font-size: 11px;
-            margin-top: 12px;
-        }
-
-        /* CONTACT */
-
-        .contact-box {
-            border: 1px solid var(--border);
-            padding: 35px;
-            background: linear-gradient(
-                135deg,
-                rgba(57, 255, 20, 0.05),
-                rgba(255, 51, 79, 0.025),
-                transparent
-            );
-            position: relative;
-        }
-
-        .contact-box::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 3px;
-            width: 70px;
-            background: var(--red);
-        }
-
-        .contact-box p {
-            color: var(--gray);
-            max-width: 600px;
-            margin-bottom: 25px;
-        }
-
-        footer {
-            padding: 25px 0;
-            border-top: 1px solid #171717;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            color: #666;
-            font-family: monospace;
-            font-size: 11px;
-        }
-
-        .footer-highlight {
-            color: var(--green);
-        }
-
-        /* MOBILE */
-
-        @media (max-width: 700px) {
-            nav {
-                min-height: 68px;
-                flex-wrap: wrap;
-                padding: 15px 0;
-            }
-
-            .logo {
-                font-size: 23px;
-            }
-
-            .nav-links {
-                width: 100%;
-                justify-content: space-between;
-                gap: 10px;
-            }
-
-            .nav-links a {
-                font-size: 12px;
-            }
-
-            .hero {
-                min-height: auto;
-                padding: 95px 0 65px;
-            }
-
-            .hero h1 {
-                letter-spacing: -2px;
-            }
-
-            .hero-bottom {
-                gap: 15px;
-                margin-top: 45px;
-            }
-
-            section:not(.hero) {
-                padding: 65px 0;
-            }
-
-            .about-grid,
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-box {
-                padding: 25px;
-            }
-
-            .terminal-body {
-                padding: 17px;
-                font-size: 12px;
-            }
-
-            .terminal-form {
-                gap: 7px;
-            }
-
-            .terminal-form label {
-                font-size: 11px;
-            }
-
-            .boot-content {
-                padding: 22px 17px 18px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                scroll-behavior: auto !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    
-        /* MATRIX RAIN BACKGROUND — decorative only, keeps all existing content intact */
-        #matrix-rain {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.22;
-        }
-        /* Keep Matrix behind the site without changing normal page layout. */
-        .boot-screen {
-            position: fixed !important;
-            inset: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            min-height: 100dvh;
-            z-index: 10000 !important;
-        }
-        @media (prefers-reduced-motion: reduce) {
-            #matrix-rain { opacity: 0.12; }
-        }
-
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="IMRX.DEV — Personal developer portfolio. Think. Build. Dominate.">
+<title>IMRX.DEV | Developer Portfolio</title>
+<style>
+:root{--bg:#050505;--card:#0b0b0b;--green:#39ff14;--red:#ff334f;--white:#f5f5f5;--gray:#999;--border:rgba(57,255,20,.22)}
+*{margin:0;padding:0;box-sizing:border-box;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;line-height:1.6;overflow-x:hidden}
+body.loading-locked{overflow:hidden}a{color:inherit;text-decoration:none}button,input{font:inherit}
+button{cursor:pointer}.container{width:min(1100px,90%);margin:auto}
+#matrix-rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.16}
+header,main,footer{position:relative;z-index:1}
+.boot-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 45%,rgba(57,255,20,.08),transparent 38%),#050505;transition:opacity .55s,visibility .55s}
+.boot-screen.is-hidden{opacity:0;visibility:hidden;pointer-events:none}.boot-panel{width:min(520px,100%);border:1px solid rgba(57,255,20,.45);background:rgba(7,7,7,.97);box-shadow:0 0 35px rgba(57,255,20,.08);font-family:monospace;overflow:hidden}
+.boot-topbar,.terminal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid #252525;background:#101010;color:#aaa;font-size:11px;letter-spacing:1px}
+.boot-lights,.terminal-lights{display:flex;gap:6px}.boot-lights span,.terminal-lights span{width:8px;height:8px;display:block;border-radius:50%;background:#333}.boot-lights span:first-child,.terminal-lights span:first-child{background:var(--red)}.boot-lights span:nth-child(2),.terminal-lights span:nth-child(2){background:#d9b34b}.boot-lights span:nth-child(3),.terminal-lights span:nth-child(3){background:var(--green)}
+.boot-content{padding:25px 22px 22px}.boot-logo,.logo{color:white;font-weight:900;letter-spacing:-1px}.boot-logo{font-size:clamp(27px,7vw,38px)}.boot-logo span,.logo span{color:var(--green);text-shadow:0 0 15px rgba(57,255,20,.55)}.boot-subtitle{color:#777;font-size:11px;letter-spacing:2px;margin-bottom:26px}.boot-lines{display:grid;gap:9px;min-height:116px;color:#aaa;font-size:12px}.boot-line{opacity:0;transform:translateY(4px);transition:.22s}.boot-line.visible{opacity:1;transform:none}.ok{color:var(--green)}.boot-progress-track{height:4px;background:#1b1b1b;margin-top:20px}.boot-progress{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--red));transition:width .3s}.boot-footer{display:flex;justify-content:space-between;margin-top:12px;color:#666;font-size:10px;letter-spacing:1px}.boot-footer strong{color:var(--green);font-weight:normal}.boot-actions{display:flex;justify-content:flex-end;margin-top:18px}
+.small-btn,.skip-boot{color:#aaa;background:#0b0b0b;border:1px solid #333;padding:8px 12px;font-family:monospace;font-size:11px}.small-btn:hover,.skip-boot:hover{color:var(--green);border-color:var(--green)}
+header{position:sticky;top:0;z-index:100;background:rgba(5,5,5,.94);backdrop-filter:blur(12px);border-bottom:1px solid #171717}
+nav{min-height:75px;display:flex;justify-content:space-between;align-items:center;gap:20px}.logo{font-size:26px;white-space:nowrap}.nav-links{display:flex;gap:25px;list-style:none}.nav-links a{color:#aaa;font-size:13px;transition:.3s}.nav-links a:hover{color:var(--green)}
+.hero{min-height:85vh;display:flex;align-items:center;position:relative;padding:90px 0}.hero::before,.hero::after{content:"";position:absolute;pointer-events:none;filter:blur(100px)}.hero::before{width:320px;height:320px;background:var(--green);opacity:.07;right:5%;top:20%}.hero::after{width:180px;height:180px;background:var(--red);opacity:.045;right:22%;bottom:8%}.hero>div{position:relative;z-index:1}
+.status{display:inline-block;color:var(--green);border:1px solid var(--border);padding:7px 12px;font-family:monospace;font-size:12px;letter-spacing:1px;margin-bottom:25px}.status::before{content:"";display:inline-block;width:7px;height:7px;background:var(--green);border-radius:50%;margin-right:9px;box-shadow:0 0 8px var(--green);animation:pulse 1.8s infinite}@keyframes pulse{50%{opacity:.35}}
+.hero h1{font-size:clamp(42px,8vw,82px);line-height:1.08;letter-spacing:-3px;font-weight:900;max-width:850px}.highlight{color:var(--green);text-shadow:0 0 18px rgba(57,255,20,.28)}.red-accent{color:var(--red)}.hero p{max-width:540px;margin-top:25px;color:var(--gray);font-size:16px}.buttons{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}.btn{display:inline-block;padding:13px 22px;border:1px solid var(--green);font-size:13px;font-weight:bold;transition:.3s;cursor:pointer}.btn-primary{background:var(--green);color:#050505}.btn-primary:hover{box-shadow:0 0 22px rgba(57,255,20,.4);transform:translateY(-2px)}.btn-outline{color:var(--green)}.btn-outline:hover{background:rgba(57,255,20,.08)}.hero-bottom{display:flex;flex-wrap:wrap;gap:35px;margin-top:65px;color:#666;font-size:11px;font-family:monospace;letter-spacing:1px}.hero-bottom span::before{content:"// ";color:var(--red)}
+section:not(.hero){padding:80px 0;border-top:1px solid #171717}.section-label{color:var(--green);font-family:monospace;font-size:12px;letter-spacing:2px;margin-bottom:12px}.section-label::before{content:"● ";color:var(--red);font-size:9px}.section-title{font-size:clamp(30px,5vw,45px);line-height:1.2;margin-bottom:20px}.section-description{color:var(--gray);max-width:650px;margin-bottom:35px}
+.about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:35px;align-items:center}.about-copy{color:var(--gray);margin-bottom:16px}.profile-card{border:1px solid var(--border);background:var(--card);padding:30px;position:relative;overflow:hidden}.profile-card::after{content:"";position:absolute;top:0;right:0;width:4px;height:55px;background:var(--red)}.profile-card .symbol{font-size:45px;color:var(--green);margin-bottom:15px}.profile-card h3{margin-bottom:8px}.profile-card p,.card p{color:var(--gray);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{padding:25px;background:var(--card);border:1px solid #202020;transition:.3s}.card:hover{border-color:var(--green);transform:translateY(-4px)}.card-icon{font-size:28px;margin-bottom:18px}.card h3{margin-bottom:10px;font-size:18px}.tag{display:inline-block;margin-top:18px;padding:5px 8px;color:var(--green);border:1px solid var(--border);font-family:monospace;font-size:10px}
+.terminal{border:1px solid #303030;background:#080808;overflow:hidden;box-shadow:0 0 28px rgba(57,255,20,.035)}.terminal-header{font-family:monospace}.terminal-body{padding:22px;font-family:monospace;font-size:13px;min-height:180px;max-height:380px;overflow-y:auto}.terminal-output{color:var(--green);white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:15px}.terminal-output .terminal-error{color:var(--red)}.terminal-form{display:flex;align-items:baseline;gap:10px}.terminal-form label{color:var(--green);white-space:nowrap}.terminal-form input{min-width:0;flex:1;color:white;background:transparent;border:none;outline:none;font:inherit;caret-color:var(--green)}.terminal-form input::placeholder{color:#555}.terminal-hint{color:#666;font-family:monospace;font-size:11px;margin-top:12px}
+.control-row{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.control-row button,.game-actions button,.game-input button{background:#0b0b0b;color:var(--green);border:1px solid var(--border);padding:9px 13px;font-family:monospace;font-size:12px}.control-row button[aria-pressed="true"]{background:var(--green);color:#050505}
+.game-card{min-height:100%;display:flex;flex-direction:column}.game-card .game-actions{margin-top:auto;padding-top:20px}.game-actions{display:flex;flex-wrap:wrap;gap:8px}.game-panel{margin-top:24px;padding:24px;border:1px solid var(--border);background:#080808;display:none}.game-panel.active{display:block}.game-panel h3{color:var(--green);margin-bottom:10px}.game-panel p{color:var(--gray);margin-bottom:12px}.game-input{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.game-input input{min-width:0;max-width:240px;background:#050505;border:1px solid #333;color:white;padding:9px 11px;font-family:monospace}.game-status{font-family:monospace;color:var(--green);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}.game-status.error{color:var(--red)}.score-strip{display:flex;flex-wrap:wrap;gap:18px;color:#aaa;font-family:monospace;font-size:12px;margin:15px 0}.score-strip strong{color:var(--green)}
+.breach-steps{display:grid;gap:12px;margin:20px 0}.breach-step{border:1px solid #252525;padding:15px;background:#0b0b0b}.breach-step.done{border-color:var(--green)}.breach-step h4{font-family:monospace;color:var(--green);margin-bottom:5px}.breach-step p{color:var(--gray);font-size:14px}.breach-step button{margin-top:10px;background:transparent;border:1px solid #444;color:#ddd;padding:7px 10px;font-family:monospace;font-size:11px}.breach-step button:hover{border-color:var(--green);color:var(--green)}
+.contact-box{border:1px solid var(--border);padding:35px;background:linear-gradient(135deg,rgba(57,255,20,.05),rgba(255,51,79,.025),transparent);position:relative}.contact-box::before{content:"";position:absolute;top:0;left:0;height:3px;width:70px;background:var(--red)}.contact-box p{color:var(--gray);max-width:600px;margin-bottom:25px}footer{padding:25px 0;border-top:1px solid #171717}.footer-content{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:#666;font-family:monospace;font-size:11px}.footer-highlight{color:var(--green)}.live-clock{color:var(--green);font-family:monospace;font-size:12px;margin-top:15px}.glitch{animation:glitch 2.5s infinite}@keyframes glitch{0%,94%,100%{text-shadow:0 0 0 transparent}95%{text-shadow:2px 0 var(--red),-2px 0 var(--green)}97%{text-shadow:-2px 0 var(--red),2px 0 var(--green)}}
+@media(max-width:700px){nav{min-height:68px;flex-wrap:wrap;padding:15px 0}.logo{font-size:23px}.nav-links{width:100%;justify-content:space-between;gap:10px}.nav-links a{font-size:12px}.hero{min-height:auto;padding:95px 0 65px}.hero h1{letter-spacing:-2px}.hero-bottom{gap:15px;margin-top:45px}section:not(.hero){padding:60px 0}.about-grid,.grid{grid-template-columns:1fr}.contact-box{padding:25px}.terminal-body{padding:17px;font-size:12px}.terminal-form{gap:7px}.terminal-form label{font-size:11px}.boot-content{padding:22px 17px 18px}.game-panel{padding:17px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}#matrix-rain{opacity:.08}}
+</style>
 </head>
-
 <body class="loading-locked">
 <canvas id="matrix-rain" aria-hidden="true"></canvas>
-
-<!-- SYSTEM BOOT SCREEN -->
-<div class="boot-screen" id="bootScreen" role="status" aria-live="polite">
-    <div class="boot-panel">
-        <div class="boot-topbar">
-            <div class="boot-lights" aria-hidden="true">
-                <span></span><span></span><span></span>
-            </div>
-            <span>IMRX_BOOT // SESSION INIT</span>
-        </div>
-
-        <div class="boot-content">
-            <div class="boot-logo">IMRX<span>.DEV</span></div>
-            <div class="boot-subtitle">SYSTEM INITIALIZING</div>
-
-            <div class="boot-lines" id="bootLines">
-                <div class="boot-line" data-delay="250"><span class="ok">[ OK ]</span> CORE SYSTEM</div>
-                <div class="boot-line" data-delay="650"><span class="ok">[ OK ]</span> LOADING MODULES</div>
-                <div class="boot-line" data-delay="1050"><span class="ok">[ OK ]</span> CHECKING INTERFACE</div>
-                <div class="boot-line" data-delay="1450"><span class="ok">[ OK ]</span> TERMINAL READY</div>
-                <div class="boot-line" data-delay="1850"><span class="ok">[ OK ]</span> SYSTEM ONLINE</div>
-            </div>
-
-            <div class="boot-progress-track" aria-hidden="true">
-                <div class="boot-progress" id="bootProgress"></div>
-            </div>
-
-            <div class="boot-footer">
-                <span>STATUS: <strong id="bootStatus">STARTING</strong></span>
-                <span id="bootPercent">0%</span>
-            </div>
-
-            <div class="boot-actions">
-                <button class="skip-boot" id="skipBoot" type="button">SKIP INTRO ↗</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<header>
-    <nav class="container">
-        <a href="#home" class="logo">IMRX<span>.DEV</span></a>
-
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-</header>
-
+<div class="boot-screen" id="bootScreen" role="status" aria-live="polite"><div class="boot-panel">
+<div class="boot-topbar"><div class="boot-lights" aria-hidden="true"><span></span><span></span><span></span></div><span>IMRX_BOOT // SESSION INIT</span></div>
+<div class="boot-content"><div class="boot-logo">IMRX<span>.DEV</span></div><div class="boot-subtitle">SYSTEM INITIALIZING</div>
+<div class="boot-lines"><div class="boot-line" data-delay="250"><span class="ok">[ OK ]</span> CORE SYSTEM</div><div class="boot-line" data-delay="650"><span class="ok">[ OK ]</span> LOADING MODULES</div><div class="boot-line" data-delay="1050"><span class="ok">[ OK ]</span> CHECKING INTERFACE</div><div class="boot-line" data-delay="1450"><span class="ok">[ OK ]</span> TERMINAL READY</div><div class="boot-line" data-delay="1850"><span class="ok">[ OK ]</span> NEXUS MODULES READY</div></div>
+<div class="boot-progress-track"><div class="boot-progress" id="bootProgress"></div></div><div class="boot-footer"><span>STATUS: <strong id="bootStatus">STARTING</strong></span><span id="bootPercent">0%</span></div><div class="boot-actions"><button class="skip-boot" id="skipBoot">SKIP INTRO ↗</button></div></div></div></div>
+<header><nav class="container"><a href="#home" class="logo">IMRX<span>.DEV</span></a><ul class="nav-links"><li><a href="#about">About</a></li><li><a href="#skills">Skills</a></li><li><a href="#projects">Projects</a></li><li><a href="#terminal">Terminal</a></li><li><a href="#games">Games</a></li><li><a href="#contact">Contact</a></li></ul></nav></header>
 <main>
-    <!-- HERO -->
-    <section class="hero container" id="home">
-        <div>
-            <div class="status">SYSTEM ONLINE // IMRX.DEV</div>
-
-            <h1>
-                THINK.<br>
-                BUILD.<br>
-                <span class="highlight">DOMINATE.</span>
-            </h1>
-
-            <p>
-                Exploring technology, building digital experiences,
-                and turning ideas into reality. Welcome to my digital space.
-            </p>
-
-            <div class="buttons">
-                <a href="#projects" class="btn btn-primary">EXPLORE PROJECTS ↗</a>
-                <a href="#contact" class="btn btn-outline">GET IN TOUCH</a>
-            </div>
-
-            <div class="hero-bottom">
-                <span>CREATIVE MINDSET</span>
-                <span>DEVELOPER IN PROGRESS</span>
-                <span>ALWAYS BUILDING</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about">
-        <div class="container">
-            <div class="section-label">// 01 — ABOUT ME</div>
-            <h2 class="section-title">Behind the <span class="highlight">Code.</span></h2>
-
-            <div class="about-grid">
-                <div>
-                    <p class="about-copy">
-                        Welcome to IMRX.DEV — a personal space dedicated
-                        to technology, creativity, and continuous growth.
-                    </p>
-
-                    <p class="about-copy">
-                        I believe every great project starts with an idea.
-                        My goal is to keep learning, develop useful skills,
-                        and turn those ideas into meaningful digital experiences.
-                    </p>
-                </div>
-
-                <div class="profile-card">
-                    <div class="symbol">&lt;/&gt;</div>
-                    <h3>IMRX.DEV</h3>
-                    <p>
-                        Independent mindset. Continuous learning.
-                        Building one project at a time.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills">
-        <div class="container">
-            <div class="section-label">// 02 — SKILLS</div>
-            <h2 class="section-title">My <span class="highlight">Toolkit.</span></h2>
-
-            <p class="section-description">
-                The foundations I use to explore, create, and improve.
-            </p>
-
-            <div class="grid">
-                <article class="card">
-                    <div class="card-icon">⌘</div>
-                    <h3>Web Development</h3>
-                    <p>
-                        Building responsive web pages with structured
-                        HTML, modern CSS, and JavaScript.
-                    </p>
-                    <span class="tag">HTML / CSS / JS</span>
-                </article>
-
-                <article class="card">
-                    <div class="card-icon">✳</div>
-                    <h3>UI & Design</h3>
-                    <p>
-                        Exploring layouts, typography, visual hierarchy,
-                        and clean digital interfaces.
-                    </p>
-                    <span class="tag">CREATIVE DESIGN</span>
-                </article>
-
-                <article class="card">
-                    <div class="card-icon">⚡</div>
-                    <h3>Problem Solving</h3>
-                    <p>
-                        Learning through experimentation, debugging,
-                        and finding practical solutions.
-                    </p>
-                    <span class="tag">KEEP LEARNING</span>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects">
-        <div class="container">
-            <div class="section-label">// 03 — PROJECTS</div>
-            <h2 class="section-title">Selected <span class="highlight">Work.</span></h2>
-
-            <p class="section-description">
-                A growing collection of experiments and digital projects.
-            </p>
-
-            <div class="grid">
-                <article class="card">
-                    <div class="card-icon">▣</div>
-                    <h3>IMRX.DEV Portfolio</h3>
-                    <p>
-                        A personal portfolio built around a dark interface,
-                        neon-green accents, and a developer-inspired aesthetic.
-                    </p>
-                    <span class="tag">PERSONAL PROJECT</span>
-                </article>
-
-                <article class="card">
-                    <div class="card-icon">⌘</div>
-                    <h3>Interactive Terminal</h3>
-                    <p>
-                        A browser-based terminal experience with simple
-                        commands and interactive responses.
-                    </p>
-                    <span class="tag">JAVASCRIPT</span>
-                </article>
-
-                <article class="card">
-                    <div class="card-icon">＋</div>
-                    <h3>Next Project</h3>
-                    <p>
-                        The next idea is waiting to be built.
-                        More experiments and projects coming soon.
-                    </p>
-                    <span class="tag">COMING SOON</span>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- TERMINAL -->
-    <section id="terminal">
-        <div class="container">
-            <div class="section-label">// 04 — INTERACTIVE TERMINAL</div>
-            <h2 class="section-title">Command <span class="highlight">Center.</span></h2>
-
-            <p class="section-description">
-                Type a command below to explore the IMRX.DEV terminal.
-                Try help, about, skills, projects, whoami, or clear.
-            </p>
-
-            <div class="terminal">
-                <div class="terminal-header">
-                    <span>IMRX_TERMINAL — BROWSER SESSION</span>
-                    <div class="terminal-lights" aria-hidden="true">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-
-                <div class="terminal-body" id="terminalBody">
-                    <div class="terminal-output" id="terminalOutput">IMRX.DEV TERMINAL
+<section class="hero container" id="home"><div><div class="status">SYSTEM ONLINE // IMRX.DEV</div><h1>THINK.<br>BUILD.<br><span class="highlight glitch">DOMINATE.</span></h1><p>Exploring technology, building digital experiences, and turning ideas into reality. Welcome to my digital space.</p><div class="buttons"><a href="#projects" class="btn btn-primary">EXPLORE PROJECTS ↗</a><a href="#contact" class="btn btn-outline">GET IN TOUCH</a></div><div class="hero-bottom"><span>CREATIVE MINDSET</span><span>DEVELOPER IN PROGRESS</span><span>ALWAYS BUILDING</span></div><div class="live-clock" id="liveClock">LOCAL TIME // --:--:--</div></div></section>
+<section id="about"><div class="container"><div class="section-label">// 01 — ABOUT ME</div><h2 class="section-title">Behind the <span class="highlight">Code.</span></h2><div class="about-grid"><div><p class="about-copy">Welcome to IMRX.DEV — a personal space dedicated to technology, creativity, and continuous growth.</p><p class="about-copy">I believe every great project starts with an idea. My goal is to keep learning, develop useful skills, and turn those ideas into meaningful digital experiences.</p></div><div class="profile-card"><div class="symbol">&lt;/&gt;</div><h3>IMRX.DEV</h3><p>Independent mindset. Continuous learning. Building one project at a time.</p></div></div></div></section>
+<section id="skills"><div class="container"><div class="section-label">// 02 — SKILLS</div><h2 class="section-title">My <span class="highlight">Toolkit.</span></h2><p class="section-description">The foundations I use to explore, create, and improve.</p><div class="grid"><article class="card"><div class="card-icon">⌘</div><h3>Web Development</h3><p>Building responsive web pages with structured HTML, modern CSS, and JavaScript.</p><span class="tag">HTML / CSS / JS</span></article><article class="card"><div class="card-icon">✳</div><h3>UI & Design</h3><p>Exploring layouts, typography, visual hierarchy, and clean digital interfaces.</p><span class="tag">CREATIVE DESIGN</span></article><article class="card"><div class="card-icon">⚡</div><h3>Problem Solving</h3><p>Learning through experimentation, debugging, and finding practical solutions.</p><span class="tag">KEEP LEARNING</span></article></div></div></section>
+<section id="projects"><div class="container"><div class="section-label">// 03 — PROJECTS</div><h2 class="section-title">Selected <span class="highlight">Work.</span></h2><p class="section-description">A growing collection of experiments and digital projects.</p><div class="grid"><article class="card"><div class="card-icon">▣</div><h3>IMRX.DEV Portfolio</h3><p>A personal portfolio built around a dark interface, neon-green accents, and a developer-inspired aesthetic.</p><span class="tag">PERSONAL PROJECT</span></article><article class="card"><div class="card-icon">⌘</div><h3>IMRX NEXUS Terminal</h3><p>A browser-based terminal with commands, player progression, secrets, and interactive tools.</p><span class="tag">JAVASCRIPT</span></article><article class="card"><div class="card-icon">▦</div><h3>NEXUS: SYSTEM BREACH</h3><p>A fictional puzzle mission built around logic challenges and progressive clearance levels.</p><span class="tag">INTERACTIVE GAME</span></article></div></div></section>
+<section id="terminal"><div class="container"><div class="section-label">// 04 — IMRX NEXUS</div><h2 class="section-title">Command <span class="highlight">Center.</span></h2><p class="section-description">A simulated terminal. Enter <b class="highlight">help</b> to explore commands. Use ↑ / ↓ for command history and Tab for autocomplete.</p>
+<div class="terminal"><div class="terminal-header"><span>IMRX_NEXUS — GUEST SESSION</span><div class="terminal-lights" aria-hidden="true"><span></span><span></span><span></span></div></div><div class="terminal-body" id="terminalBody"><div class="terminal-output" id="terminalOutput">IMRX NEXUS // TERMINAL ONLINE
 MISSION: THINK. BUILD. DOMINATE.
 
-Type "help" to view available commands.</div>
-
-                    <form class="terminal-form" id="terminalForm">
-                        <label for="terminalInput">imrx@dev:~$</label>
-                        <input
-                            id="terminalInput"
-                            type="text"
-                            placeholder="Enter command..."
-                            autocomplete="off"
-                            autocapitalize="off"
-                            spellcheck="false"
-                            aria-label="Terminal command"
-                        >
-                    </form>
-                </div>
-            </div>
-            <p class="terminal-hint">SIMULATED TERMINAL // TYPE <span class="highlight">help</span> TO BEGIN</p>
-        </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-        <div class="container">
-            <div class="section-label">// 05 — CONTACT</div>
-
-            <div class="contact-box">
-                <h2 class="section-title">
-                    Have an idea?<br>
-                    <span class="highlight">Let's build.</span>
-                </h2>
-
-                <p>
-                    Interested in connecting, sharing ideas, or collaborating
-                    on a project? Feel free to reach out.
-                </p>
-
-                <!-- Temporary placeholder: replace with your real email later. -->
-                <a
-                    class="btn btn-primary"
-                    href="mailto:hello@imrx.dev?subject=Hello%20IMRX.DEV"
-                >
-                    SEND AN EMAIL ↗
-                </a>
-            </div>
-        </div>
-    </section>
+Type "help" to view available commands.</div><form class="terminal-form" id="terminalForm"><label for="terminalInput">imrx@dev:~$</label><input id="terminalInput" type="text" placeholder="Enter command..." autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal command"></form></div></div>
+<div class="control-row"><button type="button" id="soundToggle" aria-pressed="false">SOUND: OFF</button><button type="button" id="matrixToggle" aria-pressed="true">MATRIX: ON</button><button type="button" id="terminalLogin">GUEST LOGIN</button></div><p class="terminal-hint">SIMULATED TERMINAL // PROGRESS IS STORED LOCALLY IN THIS BROWSER.</p></div></section>
+<section id="games"><div class="container"><div class="section-label">// 05 — GAME ZONE</div><h2 class="section-title">Choose Your <span class="highlight">Challenge.</span></h2><p class="section-description">Three bite-sized games, built for mouse and touchscreen. Scores and achievements are local to this browser.</p>
+<div class="grid">
+<article class="card game-card"><div class="card-icon">🔐</div><h3>Code Breaker</h3><p>Crack a secret 3-digit code. Digits do not repeat. Get clues after every guess.</p><div class="game-actions"><button type="button" data-open-game="code">START GAME</button></div></article>
+<article class="card game-card"><div class="card-icon">⚡</div><h3>Reflex Test</h3><p>Wait for the signal to turn green, then tap as fast as possible. False starts count!</p><div class="game-actions"><button type="button" data-open-game="reflex">START TEST</button></div></article>
+<article class="card game-card"><div class="card-icon">🟩</div><h3>Matrix Dodge</h3><p>Move left and right to dodge red blocks and collect green data. Use buttons or arrow keys.</p><div class="game-actions"><button type="button" data-open-game="dodge">START GAME</button></div></article>
+</div>
+<div class="game-panel" id="gamePanel"><h3 id="gameTitle">GAME MODULE</h3><div id="gameContent"></div><div class="game-status" id="gameStatus" aria-live="polite"></div></div>
+<div class="score-strip"><span>CLEARANCE: <strong id="clearanceDisplay">LEVEL 0 — GUEST</strong></span><span>XP: <strong id="xpDisplay">0</strong></span><span>ACHIEVEMENTS: <strong id="achievementDisplay">0</strong></span></div>
+</div></section>
+<section id="mission"><div class="container"><div class="section-label">// 06 — CLASSIFIED SIMULATION</div><h2 class="section-title">NEXUS: <span class="red-accent">SYSTEM BREACH.</span></h2><p class="section-description">A fictional puzzle mission. No real systems, accounts, or networks are accessed.</p><div class="profile-card"><h3>MISSION BRIEF // SIMULATION ONLY</h3><p>Complete four logic stages to unlock SYSTEM BREACH COMPLETED. Your progress is saved locally in this browser.</p><div class="breach-steps" id="breachSteps"></div><div class="game-status" id="missionStatus" aria-live="polite">MISSION STATUS: NOT STARTED</div></div></div></section>
+<section id="achievements"><div class="container"><div class="section-label">// 07 — PLAYER RECORD</div><h2 class="section-title">Clearance & <span class="highlight">Achievements.</span></h2><p class="section-description">Progress is a game mechanic, not real-world access control or security clearance.</p><div class="grid"><article class="card"><div class="card-icon">◈</div><h3 id="playerNameCard">GUEST</h3><p>Current player identity for this browser session.</p><span class="tag" id="playerLevelTag">LEVEL 0 — GUEST</span></article><article class="card"><div class="card-icon">🏆</div><h3>Achievement Log</h3><p id="achievementList">No achievements yet. Explore the terminal to begin.</p></article><article class="card"><div class="card-icon">⌁</div><h3>Local Progress</h3><p id="progressSummary">0 XP earned. Start a game or mission.</p><span class="tag">BROWSER STORAGE</span></article></div><div class="control-row"><button type="button" id="resetProgress">RESET LOCAL PROGRESS</button></div></div></section>
+<section id="contact"><div class="container"><div class="section-label">// 08 — CONTACT</div><div class="contact-box"><h2 class="section-title">Have an idea?<br><span class="highlight">Let's build.</span></h2><p>Interested in connecting, sharing ideas, or collaborating on a project? Feel free to reach out.</p><a class="btn btn-primary" href="mailto:hello@imrx.dev?subject=Hello%20IMRX.DEV">SEND AN EMAIL ↗</a></div></div></section>
 </main>
-
-<footer>
-    <div class="container footer-content">
-        <span>© <span id="year"></span> IMRX.DEV</span>
-        <span>DESIGNED & DEVELOPED BY <span class="footer-highlight">IMRX</span></span>
-        <span>SYSTEM STATUS // ONLINE</span>
-    </div>
-</footer>
-
+<footer><div class="container footer-content"><span>© <span id="year"></span> IMRX.DEV</span><span>DESIGNED & DEVELOPED BY <span class="footer-highlight">IMRX</span></span><span>SYSTEM STATUS // ONLINE</span></div></footer>
 <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+'use strict';
+const $=id=>document.getElementById(id);
+$('year').textContent=new Date().getFullYear();
+const clock=()=>{$('liveClock').textContent='LOCAL TIME // '+new Date().toLocaleTimeString();};clock();setInterval(clock,1000);
 
-    /* BOOT INTRO: once per browser tab session */
-    const bootScreen = document.getElementById("bootScreen");
-    const bootLines = Array.from(document.querySelectorAll(".boot-line"));
-    const bootProgress = document.getElementById("bootProgress");
-    const bootPercent = document.getElementById("bootPercent");
-    const bootStatus = document.getElementById("bootStatus");
-    const skipBoot = document.getElementById("skipBoot");
+/* Boot sequence */
+const bootScreen=$('bootScreen'),bootLines=[...document.querySelectorAll('.boot-line')];let bootTimers=[];
+function finishBoot(){bootTimers.forEach(clearTimeout);bootTimers=[];bootLines.forEach(x=>x.classList.add('visible'));$('bootProgress').style.width='100%';$('bootPercent').textContent='100%';$('bootStatus').textContent='ONLINE';bootScreen.classList.add('is-hidden');document.body.classList.remove('loading-locked');try{sessionStorage.setItem('imrxBootSeen','yes')}catch(e){}}
+function startBoot(){let seen=false;try{seen=sessionStorage.getItem('imrxBootSeen')==='yes'}catch(e){}if(seen){bootScreen.classList.add('is-hidden');document.body.classList.remove('loading-locked');return}bootLines.forEach((line,i)=>bootTimers.push(setTimeout(()=>{line.classList.add('visible');let n=bootLines.filter(x=>x.classList.contains('visible')).length;$('bootProgress').style.width=(n/bootLines.length*100)+'%';$('bootPercent').textContent=Math.round(n/bootLines.length*100)+'%';if(n===bootLines.length){$('bootStatus').textContent='ONLINE';bootTimers.push(setTimeout(finishBoot,450))}},Number(line.dataset.delay)||i*350)))}$('skipBoot').addEventListener('click',finishBoot);startBoot();
 
-    let bootTimers = [];
-    let audioContext = null;
-    let soundEnabled = false;
+/* Matrix rain */
+let matrixOn=true;(()=>{const canvas=$('matrix-rain'),ctx=canvas.getContext('2d');if(!ctx)return;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,chars='アカサタナハマヤラワ012345789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}';let w=0,h=0,cols=[],fs=14,raf=null;function resize(){const dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;canvas.width=Math.floor(w*dpr);canvas.height=Math.floor(h*dpr);canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);fs=w<600?12:14;cols=Array.from({length:Math.ceil(w/fs)},()=>Math.random()*(h/fs));ctx.clearRect(0,0,w,h)}function draw(){if(document.hidden||!matrixOn){raf=null;return}ctx.fillStyle='rgba(5,5,5,0.075)';ctx.fillRect(0,0,w,h);ctx.font=fs+'px monospace';for(let i=0;i<cols.length;i++){let y=cols[i]*fs;ctx.fillStyle=Math.random()<.025?'rgba(255,48,72,.9)':'rgba(57,255,20,.8)';ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,y);cols[i]=y>h&&Math.random()>.975?0:cols[i]+(reduced?.15:Math.random()*.45+.25)}raf=requestAnimationFrame(draw)}function start(){if(raf===null&&matrixOn)raf=requestAnimationFrame(draw)}function stop(){if(raf!==null)cancelAnimationFrame(raf);raf=null}resize();start();addEventListener('resize',resize,{passive:true});document.addEventListener('visibilitychange',()=>document.hidden?stop():start());$('matrixToggle').addEventListener('click',()=>{matrixOn=!matrixOn;$('matrixToggle').textContent='MATRIX: '+(matrixOn?'ON':'OFF');$('matrixToggle').setAttribute('aria-pressed',String(matrixOn));canvas.style.display=matrixOn?'block':'none';matrixOn?start():stop()})})();
 
-    function playTone(frequency, duration, type = "sine", volume = 0.025, delay = 0) {
-        if (!soundEnabled) return;
+/* Optional sound: browser audio starts only after an explicit toggle */
+let soundOn=false,audioContext=null;function tone(freq=600,duration=.08){if(!soundOn)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioContext)audioContext=new AC();if(audioContext.state==='suspended')audioContext.resume();const o=audioContext.createOscillator(),g=audioContext.createGain();o.frequency.value=freq;o.type='square';g.gain.setValueAtTime(.012,audioContext.currentTime);g.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+duration);o.connect(g);g.connect(audioContext.destination);o.start();o.stop(audioContext.currentTime+duration)}catch(e){}}
+$('soundToggle').addEventListener('click',()=>{soundOn=!soundOn;$('soundToggle').textContent='SOUND: '+(soundOn?'ON':'OFF');$('soundToggle').setAttribute('aria-pressed',String(soundOn));if(soundOn)tone(700,.1)});
 
-        try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (!AudioContextClass) return;
+/* Persistent, explicitly local player profile */
+const STORE='imrxNexusV2';let state={name:'GUEST',xp:0,achievements:[],missions:[],bestReflex:null,bestDodge:0,gamesPlayed:0};
+function loadState(){try{const saved=JSON.parse(localStorage.getItem(STORE)||'null');if(saved&&typeof saved==='object')state={...state,...saved};}catch(e){}}
+function saveState(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}renderProfile()}
+function level(){if(state.missions.length>=4||state.achievements.includes('SYSTEM BREACH COMPLETED'))return 3;if(state.achievements.includes('NEXUS ELITE'))return 3;if(state.missions.length>=2||state.gamesPlayed>=3)return 2;if(state.missions.length>=1||state.gamesPlayed>=1)return 1;return 0}
+function levelName(){return ['GUEST','SCOUT','OPERATOR','NEXUS ELITE'][level()]}
+function award(name,xp=10){if(!state.achievements.includes(name)){state.achievements.push(name);state.xp+=xp;saveState();termPrint('ACHIEVEMENT UNLOCKED: '+name,true);tone(820,.12)}}
+function renderProfile(){const lvl=level(),ln=['GUEST','SCOUT','OPERATOR','NEXUS ELITE'][lvl];$('clearanceDisplay').textContent='LEVEL '+lvl+' — '+ln;$('xpDisplay').textContent=state.xp;$('achievementDisplay').textContent=state.achievements.length;$('playerNameCard').textContent=state.name;$('playerLevelTag').textContent='LEVEL '+lvl+' — '+ln;$('achievementList').textContent=state.achievements.length?state.achievements.join(' • '):'No achievements yet. Explore the terminal to begin.';$('progressSummary').textContent=state.xp+' XP earned. '+state.gamesPlayed+' game session(s); '+state.missions.length+'/4 mission stages completed.'}
+loadState();renderProfile();if(!sessionStorage.getItem('imrxLoginPrompted')){try{sessionStorage.setItem('imrxLoginPrompted','yes')}catch(e){}}
 
-            if (!audioContext) audioContext = new AudioContextClass();
-            if (audioContext.state === "suspended") audioContext.resume();
+/* Terminal with safe text rendering, history and Tab completion */
+const terminalForm=$('terminalForm'),terminalInput=$('terminalInput'),terminalOutput=$('terminalOutput'),terminalBody=$('terminalBody');let commandHistory=[],historyIndex=0;
+function termPrint(text,isError=false){const el=document.createElement('div');el.textContent=text;if(isError)el.className='terminal-error';terminalOutput.appendChild(el);terminalBody.scrollTop=terminalBody.scrollHeight}
+const commands=['help','about','skills','projects','games','mission','level','achievements','matrix','neofetch','date','history','secret','whoami','clear','login','sound','clock'];
+const helpText='AVAILABLE COMMANDS\\nhelp          — Show commands\\nabout         — About IMRX.DEV\\nskills        — View skills\\nprojects      — View projects\\ngames         — Open Game Zone\\nmission       — Open SYSTEM BREACH\\nlevel         — View clearance level\\nachievements  — View unlocked badges\\nmatrix        — Toggle Matrix rain\\nneofetch      — Simulated system information\\ndate          — Current local date/time\\nhistory       — Recent commands\\nsecret        — Search for a hidden phrase\\nwhoami        — Current guest identity\\nlogin         — Set a browser nickname\\nsound         — Toggle optional sound\\nclock         — Show live clock\\nclear         — Clear terminal\\n\\nTip: ↑/↓ history · Tab autocomplete';
+const responseFor=cmd=>({
+help:helpText,about:'IMRX.DEV\\nA personal developer portfolio.\\nTHINK. BUILD. DOMINATE.\\nIMRX NEXUS is a fictional browser-based experience.',
+skills:'SKILLS OVERVIEW\\n01. Web Development — HTML / CSS / JavaScript\\n02. UI & Design\\n03. Problem Solving\\nSTATUS: ALWAYS LEARNING',
+projects:'PROJECT DIRECTORY\\n01. IMRX.DEV Portfolio\\n02. IMRX NEXUS Terminal\\n03. NEXUS: SYSTEM BREACH — fictional puzzle game',
+games:'GAME ZONE\\nCode Breaker · Reflex Test · Matrix Dodge\\nOpen the Game Zone section to play.',mission:'NEXUS: SYSTEM BREACH\\nFour fictional logic challenges.\\nNo real systems or networks are accessed.\\nScroll to the mission section to begin.',
+level:'CLEARANCE: LEVEL '+level()+' — '+levelName()+'\\nXP: '+state.xp,achievements:state.achievements.length?'UNLOCKED\\n'+state.achievements.join('\\n'):'No achievements yet. Start a game or mission.',
+neofetch:'IMRX NEXUS // SIMULATED SYSTEM INFO\\nOS: Browser Session\\nKernel: JavaScript (simulation)\\nUI: IMRX.DEV\\nUser: '+state.name+'\\nClearance: '+levelName()+'\\nSecurity: No real system access',
+date:()=>new Date().toString(),history:()=>commandHistory.length?commandHistory.slice(-12).map((x,i)=>(i+1)+'. '+x).join('\\n'):'No command history yet.',
+secret:'HIDDEN PHRASE HINT: the portfolio motto has three short commands. Try typing: think build dominate',whoami:'USER: '+state.name+'\\nPLATFORM: IMRX.DEV\\nSESSION: LOCAL BROWSER\\nMISSION: THINK. BUILD. DOMINATE.',
+clock:()=>$('liveClock').textContent
+})[cmd];
+terminalForm.addEventListener('submit',e=>{e.preventDefault();const raw=terminalInput.value.trim();if(!raw)return;const cmd=raw.toLowerCase();commandHistory.push(raw);historyIndex=commandHistory.length;termPrint('imrx@dev:~$ '+raw);terminalInput.value='';tone(480,.04);
+if(cmd==='clear'){terminalOutput.textContent='IMRX NEXUS // TERMINAL ONLINE\\nType "help" to view available commands.';return}
+if(cmd==='games'){location.hash='games';termPrint(responseFor(cmd));award('TERMINAL EXPLORER',5);return}
+if(cmd==='mission'){location.hash='mission';termPrint(responseFor(cmd));return}
+if(cmd==='matrix'){$('matrixToggle').click();termPrint('MATRIX RAIN: '+(matrixOn?'ON':'OFF'));return}
+if(cmd==='sound'){$('soundToggle').click();termPrint('SOUND: '+(soundOn?'ON':'OFF'));return}
+if(cmd==='login'){askLogin();return}
+if(cmd==='think build dominate'){award('SECRET HUNTER',20);termPrint('EASTER EGG ACCEPTED. THINK. BUILD. DOMINATE.');return}
+if(cmd==='secret'){termPrint(responseFor(cmd));return}
+const response=responseFor(cmd);if(response!==undefined){termPrint(typeof response==='function'?response():response);if(cmd==='help')award('TERMINAL EXPLORER',5)}else termPrint('Command not found: "'+raw+'". Type "help" to see available commands.',true);});
+terminalInput.addEventListener('keydown',e=>{if(e.key==='ArrowUp'){e.preventDefault();if(commandHistory.length){historyIndex=Math.max(0,historyIndex-1);terminalInput.value=commandHistory[historyIndex]||''}}else if(e.key==='ArrowDown'){e.preventDefault();historyIndex=Math.min(commandHistory.length,historyIndex+1);terminalInput.value=commandHistory[historyIndex]||''}else if(e.key==='Tab'){e.preventDefault();const prefix=terminalInput.value.trim().toLowerCase();const matches=commands.filter(c=>c.startsWith(prefix));if(matches.length===1)terminalInput.value=matches[0];else if(matches.length>1)termPrint('MATCHES: '+matches.join('  '))}});
+function askLogin(){const name=prompt('Choose a guest nickname (2–18 letters/numbers/_/-):',state.name==='GUEST'?'IMRX_GUEST':state.name);if(name===null)return;const clean=name.trim();if(!/^[a-zA-Z0-9_-]{2,18}$/.test(clean)){termPrint('Invalid nickname. Use 2–18 letters, numbers, _ or -.',true);return}state.name=clean;saveState();award('FIRST LOGIN',5);termPrint('GUEST SESSION READY. Welcome, '+state.name+'.');}
+$('terminalLogin').addEventListener('click',askLogin);
 
-            const oscillator = audioContext.createOscillator();
-            const gain = audioContext.createGain();
+/* Game panels */
+const gamePanel=$('gamePanel'),gameContent=$('gameContent'),gameTitle=$('gameTitle'),gameStatus=$('gameStatus');let activeGame='',codeSecret='',codeTries=0,reflexTimer=null,reflexStart=0,reflexState='idle',dodgeTimer=null,dodgeRunning=false,dodgePos=1,dodgeScore=0,dodgeTick=0,dodgeKeyHandler=null;
+function status(msg,error=false){gameStatus.textContent=msg;gameStatus.classList.toggle('error',error)}
+function openGame(name){stopDodge();clearTimeout(reflexTimer);activeGame=name;gamePanel.classList.add('active');gamePanel.scrollIntoView({behavior:'smooth',block:'nearest'});gameStatus.classList.remove('error');
+if(name==='code'){gameTitle.textContent='GAME 01 // CODE BREAKER';codeSecret='';codeTries=0;gameContent.innerHTML='<p>Crack the secret 3-digit code. Digits are unique. You have 8 attempts.</p><div class="game-input"><input id="codeGuess" inputmode="numeric" maxlength="3" placeholder="3 digits" aria-label="Three digit guess"><button id="codeSubmit">SUBMIT GUESS</button><button id="codeNew">NEW CODE</button></div><p id="codeLog" class="game-status">Ready when you are.</p>';newCode();$('codeSubmit').onclick=guessCode;$('codeNew').onclick=newCode;$('codeGuess').addEventListener('keydown',e=>{if(e.key==='Enter')guessCode()});status('MISSION: FIND THE CODE.');}
+if(name==='reflex'){gameTitle.textContent='GAME 02 // REFLEX TEST';gameContent.innerHTML='<p>Tap start, wait for the panel to turn green, then tap it as fast as you can. Do not tap early.</p><button id="reflexStart" class="btn btn-outline">START TEST</button><button id="reflexTarget" class="btn btn-outline" style="display:block;width:100%;min-height:100px;margin-top:12px;border-color:#444;color:#aaa;background:#111">WAITING FOR START</button><p id="reflexBest" class="game-status"></p>';renderReflexBest();$('reflexStart').onclick=startReflex;$('reflexTarget').onclick=hitReflex;status('READY.');}
+if(name==='dodge'){gameTitle.textContent='GAME 03 // MATRIX DODGE';gameContent.innerHTML='<p>Move the green player ◇ left/right. Avoid red ■ blocks; collect green + data. Arrow keys or touch controls work.</p><div class="score-strip"><span>SCORE: <strong id="dodgeScore">0</strong></span><span>BEST: <strong id="dodgeBest">'+state.bestDodge+'</strong></span></div><div id="dodgeBoard" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;max-width:360px;margin:14px auto;background:#111;padding:8px;border:1px solid #333" aria-label="Matrix Dodge game board"></div><div class="game-actions" style="justify-content:center"><button id="dodgeLeft">◀ LEFT</button><button id="dodgeStart">START / RESTART</button><button id="dodgeRight">RIGHT ▶</button></div>';buildDodgeBoard();$('dodgeLeft').onclick=()=>moveDodge(-1);$('dodgeRight').onclick=()=>moveDodge(1);$('dodgeStart').onclick=startDodge;dodgeKeyHandler=e=>{if(activeGame==='dodge'&&dodgeRunning){if(e.key==='ArrowLeft'){e.preventDefault();moveDodge(-1)}if(e.key==='ArrowRight'){e.preventDefault();moveDodge(1)}}};document.addEventListener('keydown',dodgeKeyHandler);status('Press START / RESTART to begin.');}
+}
+document.querySelectorAll('[data-open-game]').forEach(b=>b.addEventListener('click',()=>openGame(b.dataset.openGame)));
+function newCode(){codeSecret='';while(codeSecret.length<3){const n=Math.floor(Math.random()*10).toString();if(!codeSecret.includes(n))codeSecret+=n}codeTries=0;const log=$('codeLog');if(log)log.textContent='New code generated. Make your first guess.';const input=$('codeGuess');if(input)input.value='';status('CODE GENERATED. 8 ATTEMPTS AVAILABLE.')}
+function guessCode(){const input=$('codeGuess'),log=$('codeLog');if(!input||!log)return;const guess=input.value.trim();if(!/^\d{3}$/.test(guess)||new Set(guess).size!==3){log.textContent='Enter exactly 3 different digits.';return}if(codeTries>=8){log.textContent='Attempts exhausted. Start a new code.';return}codeTries++;let exact=0,near=0;for(let i=0;i<3;i++){if(guess[i]===codeSecret[i])exact++;else if(codeSecret.includes(guess[i]))near++}if(exact===3){log.textContent='ACCESS GRANTED. Code cracked in '+codeTries+' attempt(s)!';state.gamesPlayed++;state.xp+=Math.max(5,30-codeTries*3);saveState();award('CODE BREAKER',15);if(codeTries<=3)award('LOGIC SHARP',10);status('CODE BREAKER COMPLETE.');}else{log.textContent='Attempt '+codeTries+'/8 — '+exact+' exact position(s), '+near+' correct digit(s) in the wrong position.';if(codeTries>=8){log.textContent+=' Code was '+codeSecret+'.';status('MISSION FAILED. Start a new code.',true)}}tone(550,.06);input.value='';}
+function renderReflexBest(){const el=$('reflexBest');if(el)el.textContent='PERSONAL BEST: '+(state.bestReflex===null?'—':state.bestReflex+' ms')}
+function startReflex(){clearTimeout(reflexTimer);reflexState='waiting';const target=$('reflexTarget');target.style.background='#50131b';target.style.borderColor='var(--red)';target.style.color='white';target.textContent='WAIT FOR GREEN…';$('reflexStart').disabled=true;const delay=1200+Math.random()*3000;reflexTimer=setTimeout(()=>{if(activeGame!=='reflex')return;reflexState='go';reflexStart=performance.now();target.style.background='var(--green)';target.style.color='#050505';target.style.borderColor='var(--green)';target.textContent='TAP NOW!';tone(900,.08)},delay);status('Stay ready. Do not tap early.')}
+function hitReflex(){const target=$('reflexTarget');if(!target)return;if(reflexState==='waiting'){clearTimeout(reflexTimer);reflexState='idle';target.style.background='#301015';target.textContent='FALSE START — TRY AGAIN';$('reflexStart').disabled=false;status('False start. You tapped before green.',true);return}if(reflexState==='go'){const ms=Math.round(performance.now()-reflexStart);reflexState='done';target.style.background='#111';target.style.color='var(--green)';target.textContent=ms+' ms — RUN AGAIN';$('reflexStart').disabled=false;if(state.bestReflex===null||ms<state.bestReflex)state.bestReflex=ms;state.gamesPlayed++;state.xp+=Math.max(5,Math.round(35-ms/20));saveState();award('REFLEX INITIATED',10);if(ms<250)award('LIGHTNING REFLEX',20);renderReflexBest();status('Reaction time: '+ms+' ms.');tone(760,.1);return}status('Tap START TEST, then wait for green.')}
+function buildDodgeBoard(){const board=$('dodgeBoard');if(!board)return;board.innerHTML='';for(let i=0;i<25;i++){const cell=document.createElement('div');cell.dataset.cell=i;cell.style.cssText='aspect-ratio:1;background:#070707;border:1px solid #1b1b1b;display:grid;place-items:center;font:16px monospace;color:#777';board.appendChild(cell)}}
+let dodgeCells=[];
+function paintDodge(){const board=$('dodgeBoard');if(!board)return;dodgeCells=Array.from({length:25},()=> '');for(const obj of dodgeObjects){if(obj.y>=0&&obj.y<5)dodgeCells[obj.y*5+obj.x]=obj.type}dodgeCells[20+dodgePos]='◇';[...board.children].forEach((cell,i)=>{const v=dodgeCells[i]||'';cell.textContent=v;cell.style.color=v==='■'?'var(--red)':v==='+'?'var(--green)':v==='◇'?'var(--green)':'#777';cell.style.borderColor=v==='◇'?'var(--green)':'#1b1b1b';cell.style.background=v==='◇'?'rgba(57,255,20,.12)':'#070707'});const scoreEl=$('dodgeScore');if(scoreEl)scoreEl.textContent=dodgeScore}
+let dodgeObjects=[];
+function startDodge(){stopDodge();dodgePos=2;dodgeScore=0;dodgeTick=0;dodgeObjects=[];dodgeRunning=true;status('DODGE ACTIVE. Avoid red blocks and collect green data.');paintDodge();dodgeTimer=setInterval(()=>{dodgeTick++;dodgeObjects=dodgeObjects.map(o=>({...o,y:o.y+1})).filter(o=>o.y<5);if(Math.random()<.65)dodgeObjects.push({x:Math.floor(Math.random()*5),y:0,type:Math.random()<.32?'+':'■'});for(const o of dodgeObjects){if(o.y===4&&o.x===dodgePos){if(o.type==='■'){endDodge();return}else{dodgeScore+=10;state.xp+=1}}}dodgeScore+=1;paintDodge();if(dodgeTick%5===0)tone(300,.025);if(dodgeTick>=70)endDodge()},480)}
+function moveDodge(delta){if(!dodgeRunning)return;dodgePos=Math.max(0,Math.min(4,dodgePos+delta));paintDodge()}
+function stopDodge(){if(dodgeTimer)clearInterval(dodgeTimer);dodgeTimer=null;dodgeRunning=false;if(dodgeKeyHandler)document.removeEventListener('keydown',dodgeKeyHandler);dodgeKeyHandler=null}
+function endDodge(){stopDodge();state.gamesPlayed++;state.bestDodge=Math.max(state.bestDodge,dodgeScore);state.xp+=Math.floor(dodgeScore/3);saveState();award('MATRIX SURVIVOR',15);if(dodgeScore>=80)award('DATA COLLECTOR',15);const best=$('dodgeBest');if(best)best.textContent=state.bestDodge;status('RUN ENDED. SCORE: '+dodgeScore+'. Tap START / RESTART to play again.');}
+function stopActiveGame(){clearTimeout(reflexTimer);stopDodge();reflexState='idle'}
+function showPanel(name){const panel=$(name);if(panel)panel.scrollIntoView({behavior:'smooth',block:'start'})}
 
-            oscillator.type = type;
-            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime + delay);
-            gain.gain.setValueAtTime(0.0001, audioContext.currentTime + delay);
-            gain.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + delay + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + delay + duration);
+/* SYSTEM BREACH: harmless, local logic puzzles */
+const missionDefs=[
+{title:'STAGE 01 // INITIALIZATION',question:'A sequence reads 2, 4, 8, 16, __. What comes next?',answer:'32',hint:'Each number doubles.'},
+{title:'STAGE 02 // CODE ANALYSIS',question:'Decode the shift: each letter moves one place forward. What does “UFTU” decode to?',answer:'test',hint:'Move every letter one place backward.'},
+{title:'STAGE 03 // ACCESS CHALLENGE',question:'A 2-digit keypad code has digits that add to 9. The tens digit is 3. What is the ones digit?',answer:'6',hint:'9 − 3 = ?'},
+{title:'STAGE 04 // SECURITY PUZZLE',question:'You have 3 switches and only one powers a lamp. In this puzzle, the correct switch is the middle one. Enter LEFT, MIDDLE, or RIGHT.',answer:'middle',hint:'Observe the clue: the correct switch is in the middle.'}
+];
+function renderMission(){const root=$('breachSteps');root.innerHTML='';missionDefs.forEach((m,i)=>{const done=state.missions.includes(i);const wrap=document.createElement('div');wrap.className='breach-step'+(done?' done':'');const h=document.createElement('h4');h.textContent=(done?'[ COMPLETE ] ':'[ LOCKED / READY ] ')+m.title;const p=document.createElement('p');p.textContent=m.question;wrap.append(h,p);if(!done){const input=document.createElement('input');input.className='mission-answer';input.id='missionAnswer'+i;input.placeholder='Your answer';input.setAttribute('aria-label','Answer for '+m.title);input.style.cssText='background:#050505;border:1px solid #333;color:white;padding:8px;margin-top:10px;max-width:220px;width:100%';const btn=document.createElement('button');btn.textContent='SUBMIT ANSWER';btn.type='button';btn.onclick=()=>submitMission(i);const hint=document.createElement('button');hint.textContent='SHOW HINT';hint.type='button';hint.onclick=()=>{$('missionStatus').textContent='HINT: '+m.hint};wrap.append(input,document.createTextNode(' '),btn,document.createTextNode(' '),hint);if(i>0&&!state.missions.includes(i-1)){input.disabled=true;btn.disabled=true;hint.disabled=true;p.textContent+=' Complete the previous stage to unlock this one.'}}root.appendChild(wrap)});$('missionStatus').textContent=state.missions.length===4?'SYSTEM BREACH COMPLETED // ALL PUZZLES SOLVED':'MISSION STATUS: '+state.missions.length+'/4 stages complete';}
+function submitMission(i){if(i>0&&!state.missions.includes(i-1)){status('Complete the previous stage first.',true);return}const input=$('missionAnswer'+i);if(!input)return;const answer=input.value.trim().toLowerCase();if(answer!==missionDefs[i].answer){$('missionStatus').textContent='ACCESS DENIED // Incorrect answer. Try again or request a hint.';tone(180,.1);return}state.missions.push(i);state.missions=[...new Set(state.missions)].sort((a,b)=>a-b);state.xp+=25;saveState();award('BREACH STAGE '+(i+1),10);if(state.missions.length===4){award('SYSTEM BREACH COMPLETED',50);award('NEXUS ELITE',20)}renderMission();status('STAGE '+(i+1)+' COMPLETE.');}
+renderMission();
 
-            oscillator.connect(gain);
-            gain.connect(audioContext.destination);
-            oscillator.start(audioContext.currentTime + delay);
-            oscillator.stop(audioContext.currentTime + delay + duration + 0.03);
-        } catch (error) {
-            /* Audio is optional; the website still works if sound is unavailable. */
-        }
-    }
-
-    function playBootSound(finalSound = false) {
-        if (finalSound) {
-            playTone(660, 0.12, "sine", 0.035);
-            playTone(880, 0.18, "sine", 0.035, 0.13);
-        } else {
-            playTone(520, 0.07, "square", 0.012);
-        }
-    }
-
-    function finishBoot() {
-        bootTimers.forEach(clearTimeout);
-        bootTimers = [];
-        bootLines.forEach(line => line.classList.add("visible"));
-        bootProgress.style.width = "100%";
-        bootPercent.textContent = "100%";
-        bootStatus.textContent = "ONLINE";
-        bootStatus.style.color = "var(--green)";
-        bootScreen.classList.add("is-hidden");
-        document.body.classList.remove("loading-locked");
-
-        try {
-            sessionStorage.setItem("imrxBootSeen", "yes");
-        } catch (error) {
-            /* Session storage may be unavailable in some browser modes. */
-        }
-    }
-
-    function startBoot() {
-        let alreadySeen = false;
-
-        try {
-            alreadySeen = sessionStorage.getItem("imrxBootSeen") === "yes";
-        } catch (error) {
-            alreadySeen = false;
-        }
-
-        if (alreadySeen) {
-            bootScreen.classList.add("is-hidden");
-            document.body.classList.remove("loading-locked");
-            return;
-        }
-
-        bootLines.forEach(line => {
-            const delay = Number(line.dataset.delay) || 0;
-            const timer = setTimeout(() => {
-                line.classList.add("visible");
-                const count = bootLines.filter(item => item.classList.contains("visible")).length;
-                const percent = Math.round((count / bootLines.length) * 100);
-                bootProgress.style.width = percent + "%";
-                bootPercent.textContent = percent + "%";
-
-                if (count < bootLines.length) {
-                    playBootSound(false);
-                } else {
-                    bootStatus.textContent = "ONLINE";
-                    bootStatus.style.color = "var(--green)";
-                    playBootSound(true);
-                    const hideTimer = setTimeout(finishBoot, 450);
-                    bootTimers.push(hideTimer);
-                }
-            }, delay);
-            bootTimers.push(timer);
-        });
-    }
-
-    /* Sound is enabled only after the visitor interacts with the page. */
-    function enableSoundOnce() {
-        soundEnabled = true;
-        document.removeEventListener("pointerdown", enableSoundOnce);
-        document.removeEventListener("keydown", enableSoundOnce);
-    }
-
-    document.addEventListener("pointerdown", enableSoundOnce, { once: true });
-    document.addEventListener("keydown", enableSoundOnce, { once: true });
-
-    skipBoot.addEventListener("click", finishBoot);
-    startBoot();
-
-    /* INTERACTIVE TERMINAL */
-    const terminalForm = document.getElementById("terminalForm");
-    const terminalInput = document.getElementById("terminalInput");
-    const terminalOutput = document.getElementById("terminalOutput");
-    const terminalBody = document.getElementById("terminalBody");
-
-    const welcomeMessage =
-        'IMRX.DEV TERMINAL\n' +
-        'MISSION: THINK. BUILD. DOMINATE.\n\n' +
-        'Type "help" to view available commands.';
-
-    const responses = {
-        help:
-            "AVAILABLE COMMANDS\n" +
-            "help     — Show available commands\n" +
-            "about    — About IMRX.DEV\n" +
-            "skills   — View development skills\n" +
-            "projects — View current projects\n" +
-            "whoami   — Identify this session\n" +
-            "clear    — Clear the terminal",
-
-        about:
-            "IMRX.DEV\n" +
-            "A personal developer portfolio.\n" +
-            "Think. Build. Dominate.",
-
-        skills:
-            "SKILLS OVERVIEW\n" +
-            "01. Web Development\n" +
-            "02. UI & Design\n" +
-            "03. Problem Solving\n" +
-            "STATUS: ALWAYS LEARNING",
-
-        projects:
-            "PROJECT DIRECTORY\n" +
-            "01. IMRX.DEV Portfolio\n" +
-            "02. Interactive Terminal\n" +
-            "03. Next Project — Coming Soon",
-
-        whoami:
-            "USER: IMRX\n" +
-            "PLATFORM: IMRX.DEV\n" +
-            "MISSION: THINK. BUILD. DOMINATE."
-    };
-
-    terminalForm.addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        const rawCommand = terminalInput.value.trim();
-        const command = rawCommand.toLowerCase();
-
-        if (!command) return;
-
-        if (command === "clear") {
-            terminalOutput.textContent = welcomeMessage;
-        } else {
-            const response = responses[command];
-
-            const commandLine = document.createElement("div");
-            commandLine.textContent = "\nimrx@dev:~$ " + rawCommand;
-            terminalOutput.appendChild(commandLine);
-
-            const responseLine = document.createElement("div");
-            responseLine.textContent = response || 'Command not found: "' + rawCommand + '".\nType "help" to see available commands.';
-            if (!response) responseLine.className = "terminal-error";
-            terminalOutput.appendChild(responseLine);
-        }
-
-        terminalInput.value = "";
-        terminalBody.scrollTop = terminalBody.scrollHeight;
-    });
-
-    /* MATRIX RAIN: green symbols with occasional red accents */
-    (() => {
-        const canvas = document.getElementById('matrix-rain');
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d', { alpha: true });
-        if (!ctx) return;
-
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const chars = 'アカサタナハマヤラワ012345789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>[]{}';
-        let width = 0;
-        let height = 0;
-        let columns = [];
-        let fontSize = 14;
-        let frame = 0;
-        let animationId = null;
-
-        function resizeMatrix() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = Math.floor(width * dpr);
-            canvas.height = Math.floor(height * dpr);
-            canvas.style.width = width + 'px';
-            canvas.style.height = height + 'px';
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            fontSize = width < 600 ? 12 : 14;
-            columns = Array.from(
-                { length: Math.ceil(width / fontSize) },
-                () => Math.random() * (height / fontSize)
-            );
-            ctx.clearRect(0, 0, width, height);
-        }
-
-        function drawMatrix() {
-            if (document.hidden) {
-                animationId = null;
-                return;
-            }
-
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.075)';
-            ctx.fillRect(0, 0, width, height);
-            ctx.font = fontSize + 'px monospace';
-
-            for (let i = 0; i < columns.length; i++) {
-                const char = chars[Math.floor(Math.random() * chars.length)];
-                const x = i * fontSize;
-                const y = columns[i] * fontSize;
-                const redAccent = Math.random() < 0.025;
-
-                ctx.fillStyle = redAccent ? 'rgba(255, 48, 48, 0.9)' : 'rgba(57, 255, 20, 0.8)';
-                ctx.fillText(char, x, y);
-
-                if (y > height && Math.random() > 0.975) {
-                    columns[i] = 0;
-                } else {
-                    columns[i] += reducedMotion ? 0.15 : (Math.random() * 0.45 + 0.25);
-                }
-            }
-
-            frame++;
-            animationId = window.requestAnimationFrame(drawMatrix);
-        }
-
-        function startMatrix() {
-            if (animationId === null) {
-                animationId = window.requestAnimationFrame(drawMatrix);
-            }
-        }
-
-        function stopMatrix() {
-            if (animationId !== null) {
-                window.cancelAnimationFrame(animationId);
-                animationId = null;
-            }
-        }
-
-        resizeMatrix();
-        startMatrix();
-        window.addEventListener('resize', resizeMatrix, { passive: true });
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) stopMatrix();
-            else startMatrix();
-        });
-    })();
-
+/* Profile reset */
+$('resetProgress').addEventListener('click',()=>{if(!confirm('Reset all locally saved IMRX NEXUS progress, nickname, scores and achievements?'))return;state={name:'GUEST',xp:0,achievements:[],missions:[],bestReflex:null,bestDodge:0,gamesPlayed:0};saveState();renderMission();renderProfile();termPrint('LOCAL PLAYER DATA RESET.')});
+/* Secret hunter: exact motto easter egg is handled by terminal. */
+$('terminalLogin').title='Choose a nickname for this browser profile';
 </script>
-
 </body>
 </html>
